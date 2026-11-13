@@ -1,4 +1,8 @@
-/* Reset y estilos base */
+
+/* =========================================
+   ESTILOS GENERALES
+========================================= */
+
 * {
     margin: 0;
     padding: 0;
@@ -6,314 +10,299 @@
 }
 
 body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-color: #f5f5f5;
-    color: #333;
-    line-height: 1.6;
+    font-family: Arial, Helvetica, sans-serif;
+    background: #f2f5f8;
+    color: #263238;
 }
 
-/* Header */
+/* =========================================
+   ENCABEZADO
+========================================= */
+
 .header {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: #17365d;
     color: white;
-    padding: 1.5rem 2rem;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    padding: 20px;
+    text-align: center;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.18);
 }
 
-.header-content h1 {
-    font-size: 1.8rem;
-    margin-bottom: 0.5rem;
-    font-weight: 600;
+.header h1 {
+    font-size: 26px;
+    margin-bottom: 8px;
 }
 
-.header-content p {
-    font-size: 0.95rem;
-    opacity: 0.9;
+.header p {
+    font-size: 14px;
+    color: #e0eaf4;
 }
 
-/* Contenedor principal */
+/* =========================================
+   DISTRIBUCIÓN PRINCIPAL
+========================================= */
+
 .main-container {
     display: flex;
-    height: calc(100vh - 140px);
+    min-height: calc(100vh - 145px);
 }
 
-/* Sidebar */
+/* =========================================
+   PANEL LATERAL
+========================================= */
+
 .sidebar {
     width: 320px;
-    background-color: white;
-    padding: 1.5rem;
+    min-width: 320px;
+    background: white;
+    padding: 16px;
     overflow-y: auto;
-    box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+    border-right: 1px solid #d8dee5;
 }
 
 .sidebar-section {
-    margin-bottom: 2rem;
+    background: #ffffff;
+    border: 1px solid #dce3ea;
+    border-radius: 8px;
+    padding: 14px;
+    margin-bottom: 15px;
 }
 
 .sidebar-section h2 {
-    font-size: 1.1rem;
-    margin-bottom: 1rem;
-    color: #667eea;
-    border-bottom: 2px solid #667eea;
-    padding-bottom: 0.5rem;
+    font-size: 17px;
+    color: #17365d;
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid #e8edf2;
+}
+
+.sidebar-section p {
+    margin-bottom: 9px;
+    line-height: 1.5;
+    font-size: 13px;
 }
 
 .sidebar-section ul {
-    list-style: none;
-    padding-left: 0;
+    padding-left: 20px;
+    margin: 10px 0;
 }
 
 .sidebar-section li {
-    padding: 0.5rem 0;
-    border-bottom: 1px solid #eee;
-}
-
-.sidebar-section li:last-child {
-    border-bottom: none;
+    font-size: 13px;
+    margin-bottom: 7px;
+    line-height: 1.4;
 }
 
 .info-text {
-    font-size: 0.9rem;
-    color: #666;
-    margin-top: 1rem;
-    padding: 0.75rem;
-    background-color: #f9f9f9;
-    border-left: 3px solid #667eea;
-    border-radius: 3px;
+    color: #64748b;
+    font-size: 12px !important;
 }
 
 .small-text {
-    font-size: 0.85rem;
-    color: #666;
-    line-height: 1.8;
+    color: #536273;
+    font-size: 12px !important;
+    line-height: 1.6 !important;
 }
 
-/* Búsqueda */
+.highlight {
+    color: #d35400;
+    font-size: 16px !important;
+    font-weight: bold;
+}
+
+/* =========================================
+   BUSCADOR DE CIUDADES
+========================================= */
+
+.search-container {
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+}
+
 .search-input {
+    display: block;
     width: 100%;
-    padding: 0.75rem;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    font-size: 0.95rem;
-    margin-bottom: 0.75rem;
-    transition: border-color 0.3s;
+    min-height: 40px;
+    padding: 10px;
+    border: 1px solid #b8c5d1;
+    border-radius: 5px;
+    font-size: 14px;
+    background: white;
+    color: #263238;
 }
 
 .search-input:focus {
     outline: none;
-    border-color: #667eea;
+    border-color: #2874a6;
+    box-shadow: 0 0 0 2px rgba(40,116,166,0.15);
 }
 
 .btn-primary {
+    display: block;
     width: 100%;
-    padding: 0.75rem;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    padding: 11px;
+    background: #2874a6;
     color: white;
     border: none;
-    border-radius: 4px;
-    font-size: 0.95rem;
-    font-weight: 600;
+    border-radius: 5px;
+    font-size: 14px;
+    font-weight: bold;
     cursor: pointer;
-    transition: transform 0.2s, box-shadow 0.2s;
+    transition: background 0.2s;
 }
 
 .btn-primary:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
-}
-
-.btn-primary:active {
-    transform: translateY(0);
+    background: #1b4f72;
 }
 
 #search-results {
-    margin-top: 1rem;
+    margin-top: 12px;
+    max-height: 240px;
+    overflow-y: auto;
+}
+
+#search-results h3 {
+    font-size: 13px;
+    margin-bottom: 8px;
+    color: #17365d;
 }
 
 .search-result-item {
-    padding: 0.75rem;
-    background-color: #f9f9f9;
-    border-left: 3px solid #667eea;
-    margin-bottom: 0.5rem;
+    padding: 10px;
+    margin-bottom: 6px;
+    background: #edf4fa;
+    border: 1px solid #d5e3ef;
+    border-radius: 5px;
     cursor: pointer;
-    transition: background-color 0.2s;
-    border-radius: 3px;
+    font-size: 13px;
+    transition: background 0.2s;
 }
 
 .search-result-item:hover {
-    background-color: #e9ecef;
+    background: #d6eaf8;
+    border-color: #2874a6;
 }
 
-/* Contenedor del mapa */
+.search-result-item strong {
+    color: #17365d;
+}
+
+/* =========================================
+   MAPA
+========================================= */
+
 .map-container {
     flex: 1;
-    position: relative;
+    min-width: 0;
+    padding: 12px;
 }
 
 #map {
     width: 100%;
-    height: 100%;
-}
-
-/* Footer */
-.footer {
-    background-color: #2c3e50;
-    color: white;
-    text-align: center;
-    padding: 1rem;
-    font-size: 0.9rem;
-}
-
-/* Estilos de Leaflet personalizados */
-.leaflet-popup-content-wrapper {
+    height: calc(100vh - 175px);
+    min-height: 500px;
+    border: 1px solid #cbd5df;
     border-radius: 8px;
-    box-shadow: 0 3px 14px rgba(0,0,0,0.4);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+    z-index: 1;
 }
 
-.leaflet-popup-content {
-    margin: 1rem;
-    font-size: 0.95rem;
-}
+/* =========================================
+   LEYENDA
+========================================= */
 
-.popup-title {
-    font-size: 1.3rem;
-    color: #667eea;
-    margin-bottom: 0.75rem;
-    font-weight: 600;
-}
-
-.popup-info {
-    margin: 0.5rem 0;
-}
-
-.popup-info strong {
-    color: #555;
-}
-
-.popup-divider {
-    height: 1px;
-    background-color: #eee;
-    margin: 0.75rem 0;
-}
-
-/* Control de información personalizado */
-.info-control {
-    padding: 10px 15px;
-    font: 14px/16px Arial, sans-serif;
-    background: white;
-    background: rgba(255,255,255,0.95);
-    box-shadow: 0 0 15px rgba(0,0,0,0.2);
-    border-radius: 5px;
-    min-width: 200px;
-}
-
-.info-control h4 {
-    margin: 0 0 5px;
-    color: #667eea;
-    font-size: 1rem;
-}
-
-.info-control p {
-    margin: 5px 0;
-    font-size: 0.9rem;
-}
-
-.info-control .highlight {
-    font-weight: bold;
-    color: #333;
-}
-
-/* Leyenda */
 .legend {
-    line-height: 18px;
-    color: #555;
     background: white;
-    background: rgba(255,255,255,0.95);
-    padding: 10px;
-    border-radius: 5px;
-    box-shadow: 0 0 15px rgba(0,0,0,0.2);
+    padding: 12px;
+    border-radius: 6px;
+    box-shadow: 0 1px 6px rgba(0,0,0,0.25);
+    line-height: 23px;
+    color: #263238;
 }
 
 .legend h4 {
-    margin: 0 0 5px;
-    color: #667eea;
+    font-size: 14px;
+    margin-bottom: 8px;
+    color: #17365d;
 }
 
-.legend i {
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+}
+
+.legend-item i {
     width: 18px;
-    height: 18px;
-    float: left;
-    margin-right: 8px;
-    opacity: 0.7;
-    border: 1px solid #999;
+    height: 14px;
+    display: inline-block;
+    border: 1px solid #555;
 }
 
-/* Control de capas personalizado */
-.leaflet-control-layers {
-    border: 2px solid rgba(0,0,0,0.2);
-    border-radius: 5px;
-    background: white;
+/* =========================================
+   VENTANAS EMERGENTES
+========================================= */
+
+.popup-title {
+    font-size: 16px;
+    font-weight: bold;
+    color: #17365d;
+    margin-bottom: 8px;
 }
 
-.leaflet-control-layers-expanded {
-    padding: 10px;
+.popup-divider {
+    border-bottom: 2px solid #2874a6;
+    margin-bottom: 8px;
 }
 
-/* Responsive */
-@media (max-width: 768px) {
+.leaflet-popup-content p {
+    margin: 5px 0;
+    font-size: 12px;
+    line-height: 1.5;
+}
+
+/* =========================================
+   PIE DE PÁGINA
+========================================= */
+
+.footer {
+    background: #17365d;
+    color: white;
+    text-align: center;
+    padding: 12px;
+    font-size: 12px;
+}
+
+/* =========================================
+   RESPONSIVE
+========================================= */
+
+@media (max-width: 800px) {
+
     .main-container {
         flex-direction: column;
-        height: auto;
     }
 
     .sidebar {
         width: 100%;
-        max-height: 300px;
+        min-width: 0;
+        max-height: none;
+        border-right: none;
+        border-bottom: 1px solid #d8dee5;
     }
 
     .map-container {
-        height: 500px;
+        padding: 8px;
     }
 
-    .header-content h1 {
-        font-size: 1.4rem;
+    #map {
+        height: 65vh;
+        min-height: 400px;
     }
 
-    .header-content p {
-        font-size: 0.85rem;
+    .header h1 {
+        font-size: 20px;
     }
-}
 
-/* Animaciones */
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(-10px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-.sidebar-section {
-    animation: fadeIn 0.5s ease-in-out;
-}
-
-/* Scrollbar personalizado para sidebar */
-.sidebar::-webkit-scrollbar {
-    width: 8px;
-}
-
-.sidebar::-webkit-scrollbar-track {
-    background: #f1f1f1;
-}
-
-.sidebar::-webkit-scrollbar-thumb {
-    background: #667eea;
-    border-radius: 4px;
-}
-
-.sidebar::-webkit-scrollbar-thumb:hover {
-    background: #764ba2;
 }
