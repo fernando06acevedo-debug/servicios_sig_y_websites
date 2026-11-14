@@ -240,3 +240,21 @@ Curso de Servicios Web Geográficos - 2025
 ---
 
 **¿Problemas?** Consulta los capítulos del curso o abre la consola del navegador (F12) para ver mensajes de error detallados.
+
+---
+
+## Autor y desarrollo del proyecto
+
+**Autor: Luis Fernando Acevedo Suarez**
+
+Este trabajo lo desarrollé como parte de las actividades del curso de Sistemas de Información Geográfica. Mi propósito fue construir una aplicación web que permitiera visualizar y consultar información geográfica de forma interactiva utilizando Leaflet.
+
+Durante el desarrollo trabajé con herramientas como GeoServer, PostGIS y pg_tileserv. Realicé la configuración de los servicios WMS y WFS e incorporé la visualización de información municipal mediante Vector Tiles.
+
+En el proceso fui haciendo pruebas, revisando configuraciones y solucionando inconvenientes que se presentaron al conectar los diferentes servicios con la aplicación. Esto me permitió entender mejor cómo se pueden integrar las bases de datos geográficas y los servicios web en un visor cartográfico.
+
+Como resultado, logré construir una aplicación que permite cambiar mapas base, visualizar capas geográficas, consultar información y explorar el territorio mediante diferentes controles.
+
+Este proyecto recoge el trabajo práctico que realicé durante el taller y los conocimientos que fui aplicando a medida que avanzaba en su desarrollo.
+
+**Desarrollado por: Luis Fernando Acevedo Suarez.**
