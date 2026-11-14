@@ -1,261 +1,98 @@
-# Aplicación Web - Visualización de Departamentos y Municipios de Colombia
+﻿# Visor geográfico de la división administrativa de Colombia
 
-Esta es una aplicación web interactiva que consume servicios WMS y WFS de GeoServer para visualizar la división administrativa de Colombia.
+**Autor:** Luis Fernando Acevedo Suarez  
+**Proyecto:** Taller 11 – Aplicación Web SIG con Leaflet  
+**Tecnología principal:** Leaflet.js
 
-## Características
+## Presentación
 
-- Visualización de departamentos y municipios mediante WMS
-- Búsqueda de departamentos por nombre
-- Información detallada al hacer clic
-- Múltiples capas base (OpenStreetMap, Satélite, CartoDB)
-- Diseño responsive (funciona en móvil y desktop)
-- Interactividad con datos WFS (GeoJSON)
-- Highlight al pasar el mouse
-- Control de escala y capas
+Esta aplicación web permite visualizar y explorar información geográfica de la división político-administrativa de Colombia mediante un visor cartográfico interactivo.
 
-## Requisitos Previos
+El desarrollo integra tecnologías de publicación y consulta de información geográfica, combinando servicios OGC, una base de datos espacial y teselas vectoriales para representar diferentes niveles de información territorial.
 
-1. **GeoServer** debe estar ejecutándose en `http://localhost:8080/geoserver`
-2. Workspace `taller` creado en GeoServer
-3. Capas `departamentos` y `municipios` publicadas
-4. Datos cargados en PostgreSQL/PostGIS
+La aplicación se encuentra alojada mediante GitHub Pages.
 
-## Estructura de Archivos
+**Aplicación publicada:**  
+https://fernando06acevedo-debug.github.io/servicios_sig_y_websites/Taller_11_Leaflet/
 
-```
-webapp/
-├── index.html          # Página principal
+## Funcionalidades
+
+- Visualización de departamentos de Colombia.
+- Consulta y representación de municipios.
+- Visualización de ciudades mediante información geográfica servida por WFS.
+- Integración de capas WMS.
+- Representación de municipios mediante Vector Tiles (MVT/PBF).
+- Selección de mapas base: OpenStreetMap, Esri Satélite y CartoDB.
+- Búsqueda y localización de ciudades.
+- Consulta de atributos mediante ventanas emergentes.
+- Resaltado de entidades geográficas al interactuar con el mapa.
+- Control de capas, leyenda y escala cartográfica.
+- Diseño adaptable a diferentes tamaños de pantalla.
+
+## Fuentes y organización de la información
+
+La aplicación integra información de la división político-administrativa asociada al Marco Geoestadístico Nacional (MGN) 2025.
+
+La información se organiza y publica mediante servicios geográficos y una base de datos espacial:
+
+| Componente | Función |
+|---|---|
+| GeoServer | Publicación de servicios WMS y WFS |
+| PostgreSQL/PostGIS | Almacenamiento y gestión de información espacial |
+| pg_tileserv | Publicación de teselas vectoriales |
+| Leaflet.js | Visualización e interacción cartográfica |
+| Leaflet.VectorGrid | Representación de Vector Tiles |
+
+## Servicios geográficos implementados
+
+**GeoServer – WMS**
+
+Permite representar las capas de departamentos y municipios como servicios cartográficos.
+
+**GeoServer – WFS**
+
+Permite consultar entidades y atributos geográficos, incluyendo la información de ciudades.
+
+**pg_tileserv – Vector Tiles**
+
+Permite representar la capa de municipios mediante teselas vectoriales en formato PBF.
+
+Los nombres de las capas y las direcciones de los servicios se encuentran documentados en `SERVICIOS_Y_CAPAS.md`.
+
+## Estructura del proyecto
+
+```text
+Taller_11_Leaflet/
+├── index.html
+├── README.md
+├── SERVICIOS_Y_CAPAS.md
+├── Entrega_Capitulo11_Leaflet.zip
 ├── css/
-│   └── style.css      # Estilos personalizados
+│   └── style.css
 ├── js/
-│   └── app.js         # Lógica de la aplicación
-└── README.md          # Este archivo
+│   └── app.js
+└── evidencias/
+    └── LEEME.md
 ```
 
-## Configuración
+## Publicación y disponibilidad
 
-### 1. Verificar URLs de GeoServer
+La interfaz del visor se encuentra publicada mediante GitHub Pages.
 
-Abre `js/app.js` y verifica las URLs:
+Los servicios GeoServer y pg_tileserv utilizados durante el desarrollo están configurados en un entorno local. Por esta razón, las direcciones `localhost` permiten el acceso desde el equipo donde se encuentran ejecutándose los servicios, pero no constituyen servicios públicos disponibles desde cualquier ubicación de Internet.
 
-```javascript
-const GEOSERVER_URL = 'http://localhost:8080/geoserver/taller/wms';
-const WFS_URL = 'http://localhost:8080/geoserver/taller/wfs';
-```
+Para habilitar el consumo externo de todas las capas es necesario desplegar GeoServer y pg_tileserv en una infraestructura accesible públicamente y actualizar las direcciones de conexión de la aplicación.
 
-Si tu GeoServer está en otra dirección o puerto, modifica estas líneas.
+## Resultado del desarrollo
 
-### 2. Verificar Nombres de Capas
+Como resultado se obtuvo un visor cartográfico que integra diferentes fuentes y formatos de información geográfica. La aplicación permite explorar la división administrativa de Colombia, consultar entidades, cambiar la cartografía base y visualizar información mediante servicios WMS, WFS y Vector Tiles.
 
-En `js/app.js`, verifica que los nombres de las capas coincidan con los publicados en GeoServer:
+Durante el desarrollo se realizaron pruebas de conexión, publicación y visualización de capas, así como ajustes en la configuración de los servicios y en la interacción del visor.
 
-```javascript
-const departamentosWMS = L.tileLayer.wms(GEOSERVER_URL, {
-    layers: 'taller:departamentos',  // Formato: workspace:capa
-    ...
-});
-```
+Este trabajo permitió aplicar los conceptos de servicios web geográficos y fortalecer la integración entre bases de datos espaciales, servidores cartográficos y aplicaciones web.
 
-## Instalación y Ejecución
-
-### Método 1: Servidor HTTP Simple (Python)
-
-Si tienes Python instalado:
-
-```bash
-# Python 3
-cd webapp
-python -m http.server 8000
-
-# Python 2
-python -m SimpleHTTPServer 8000
-```
-
-Luego abre en el navegador: [http://localhost:8000](http://localhost:8000)
-
-### Método 2: Node.js http-server
-
-Si tienes Node.js:
-
-```bash
-# Instalar http-server globalmente
-npm install -g http-server
-
-# Ejecutar
-cd webapp
-http-server -p 8000
-```
-
-Abre: [http://localhost:8000](http://localhost:8000)
-
-### Método 3: Abrir Directamente
-
-Puedes abrir `index.html` directamente en el navegador, pero es posible que encuentres problemas de CORS al cargar datos desde GeoServer.
-
-**Recomendado**: Usar un servidor HTTP local.
-
-## Solución de Problemas
-
-### Error: No se pueden cargar los datos de departamentos
-
-**Causa**: GeoServer no está ejecutándose o las URLs son incorrectas.
-
-**Solución**:
-1. Verifica que GeoServer esté corriendo: [http://localhost:8080/geoserver](http://localhost:8080/geoserver)
-2. Verifica que el workspace `taller` existe
-3. Verifica que las capas `departamentos` y `municipios` están publicadas
-4. Revisa la consola del navegador (F12) para ver errores específicos
-
-### Error de CORS
-
-**Causa**: El navegador bloquea peticiones cross-origin.
-
-**Solución**:
-1. Usa un servidor HTTP local (Python o Node.js)
-2. O configura CORS en GeoServer (ver documentación del Capítulo 8)
-
-### Las capas WMS no se muestran
-
-**Causa**: Nombres de capas incorrectos o GeoServer no responde.
-
-**Solución**:
-1. Verifica los nombres en GeoServer: **Data** → **Layers**
-2. Prueba la URL WMS directamente en el navegador:
-   ```
-   http://localhost:8080/geoserver/taller/wms?service=WMS&request=GetCapabilities
-   ```
-3. Verifica que las capas estén habilitadas (Enabled = ✅)
-
-### La búsqueda no funciona
-
-**Causa**: Los datos WFS no se cargaron correctamente.
-
-**Solución**:
-1. Abre la consola del navegador (F12)
-2. Busca mensajes de error
-3. Verifica que la URL WFS sea correcta
-4. Prueba la URL WFS en el navegador:
-   ```
-   http://localhost:8080/geoserver/taller/wfs?service=WFS&version=2.0.0&request=GetFeature&typeName=taller:departamentos&outputFormat=application/json&count=1
-   ```
-
-## Personalización
-
-### Cambiar Colores
-
-Edita `css/style.css`:
-
-```css
-.header {
-    background: linear-gradient(135deg, #TU_COLOR1 0%, #TU_COLOR2 100%);
-}
-```
-
-### Cambiar Centro del Mapa
-
-Edita `js/app.js`:
-
-```javascript
-const MAP_CONFIG = {
-    center: [latitud, longitud],  // Ej: [4.5709, -74.2973]
-    zoom: 6
-};
-```
-
-### Agregar Más Capas Base
-
-Edita `js/app.js` en la sección `baseLayers`:
-
-```javascript
-const baseLayers = {
-    'Tu Capa': L.tileLayer('URL_DE_TU_CAPA', {
-        attribution: 'Atribución',
-        maxZoom: 19
-    })
-};
-```
-
-### Modificar Estilos de Features
-
-Edita la función `featureStyle` en `js/app.js`:
-
-```javascript
-function featureStyle(feature) {
-    return {
-        fillColor: '#TU_COLOR',    // Color de relleno
-        weight: 2,                  // Grosor del borde
-        opacity: 0.8,              // Opacidad del borde
-        color: '#BORDE_COLOR',     // Color del borde
-        fillOpacity: 0.4           // Opacidad del relleno
-    };
-}
-```
-
-## Despliegue en Producción
-
-### GitHub Pages
-
-1. Sube el código a GitHub
-2. Ve a **Settings** → **Pages**
-3. Selecciona la rama y carpeta `/webapp`
-4. Guarda
-
-**Nota**: Actualiza las URLs de GeoServer a tu servidor público.
-
-### Netlify
-
-1. Arrastra la carpeta `webapp` a [Netlify Drop](https://app.netlify.com/drop)
-2. Tu sitio estará en línea en segundos
-
-### Servidor Propio
-
-1. Copia los archivos a tu servidor web (Apache, Nginx, etc.)
-2. Configura HTTPS
-3. Actualiza las URLs de GeoServer
-
-## Tecnologías Utilizadas
-
-- **Leaflet.js** 1.9.4 - Biblioteca de mapas interactivos
-- **GeoServer** - Servidor de mapas OGC
-- **HTML5/CSS3** - Estructura y estilos
-- **JavaScript ES6** - Lógica de la aplicación
-- **OGC WMS/WFS** - Estándares de servicios web geográficos
-
-## Recursos Adicionales
-
-- [Documentación de Leaflet](https://leafletjs.com/)
-- [Tutoriales de Leaflet](https://leafletjs.com/examples.html)
-- [Documentación de GeoServer](https://docs.geoserver.org/)
-- [Estándares OGC](https://www.ogc.org/standards/)
-
-## Licencia
-
-Este proyecto es parte del Curso de Servicios Web Geográficos y está disponible para fines educativos.
-
-## Autor
+## Autoría
 
 **Luis Fernando Acevedo Suarez**
 
-Curso de Servicios Web Geográficos - 2025
-
----
-
-**¿Problemas?** Consulta los capítulos del curso o abre la consola del navegador (F12) para ver mensajes de error detallados.
-
----
-
-## Autor y desarrollo del proyecto
-
-**Autor: Luis Fernando Acevedo Suarez**
-
-Este trabajo lo desarrollé como parte de las actividades del curso de Sistemas de Información Geográfica. Mi propósito fue construir una aplicación web que permitiera visualizar y consultar información geográfica de forma interactiva utilizando Leaflet.
-
-Durante el desarrollo trabajé con herramientas como GeoServer, PostGIS y pg_tileserv. Realicé la configuración de los servicios WMS y WFS e incorporé la visualización de información municipal mediante Vector Tiles.
-
-En el proceso fui haciendo pruebas, revisando configuraciones y solucionando inconvenientes que se presentaron al conectar los diferentes servicios con la aplicación. Esto me permitió entender mejor cómo se pueden integrar las bases de datos geográficas y los servicios web en un visor cartográfico.
-
-Como resultado, logré construir una aplicación que permite cambiar mapas base, visualizar capas geográficas, consultar información y explorar el territorio mediante diferentes controles.
-
-Este proyecto recoge el trabajo práctico que realicé durante el taller y los conocimientos que fui aplicando a medida que avanzaba en su desarrollo.
-
-**Desarrollado por: Luis Fernando Acevedo Suarez.**
+Desarrollo académico realizado en el marco del curso de Servicios Web Geográficos.
