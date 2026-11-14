@@ -234,7 +234,8 @@ Este proyecto es parte del Curso de Servicios Web Geográficos y está disponibl
 
 ## Autor
 
-Edwin Piragauta Vargas
+**Luis Fernando Acevedo Suarez**
+
 Curso de Servicios Web Geográficos - 2025
 
 ---
