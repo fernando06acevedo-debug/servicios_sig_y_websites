@@ -1,37 +1,22 @@
 
 /* =====================================================
    APLICACIÓN WEB SIG - LEAFLET
-   GeoServer + PostGIS + WMS + WFS + VECTOR TILES
+   Leaflet + GeoJSON estatico + GitHub Pages
    ===================================================== */
 
 // =====================================================
 // 1. CONFIGURACIÓN DE SERVICIOS
 // =====================================================
 
-const GEOSERVER_OWS =
-    'http://localhost:8080/geoserver/taller_gis/ows';
+// FUENTES GEOJSON ESTATICAS PARA GITHUB PAGES
 
-const GEOSERVER_WMS =
-    'http://localhost:8080/geoserver/taller_gis/wms';
+const GEOJSON_BOSQUE =
+    'https://epiragauta.github.io/geoservicios_y_websites/webapp/datos/85_CASANARE/Bosque.geojson';
 
-const PG_TILESERV =
-    'http://localhost:7800';
+const GEOJSON_DRENAJE =
+    'https://epiragauta.github.io/geoservicios_y_websites/webapp/datos/85_CASANARE/Drenaje_Sencillo.geojson';
 
-const WFS_URL =
-    GEOSERVER_OWS +
-    '?service=WFS&version=2.0.0&request=GetFeature' +
-    '&typeNames=taller_gis:ciudades' +
-    '&outputFormat=application/json&srsName=EPSG:4326';
 
-const WFS_DEPARTAMENTOS_URL =
-    GEOSERVER_OWS +
-    '?service=WFS&version=2.0.0&request=GetFeature' +
-    '&typeNames=taller_gis:departamentos_mgn2025' +
-    '&outputFormat=application/json&srsName=EPSG:4326';
-
-const MUNICIPIOS_VECTOR_URL =
-    PG_TILESERV +
-    '/public.municipios_mgn2025/{z}/{x}/{y}.pbf';
 
 // =====================================================
 // 2. CONFIGURACIÓN DEL MAPA
@@ -50,9 +35,144 @@ const map = L.map('map', {
     minZoom: MAP_CONFIG.minZoom,
     maxZoom: MAP_CONFIG.maxZoom
 });
+// =====================================================
+// CAPAS GEOJSON EXTERNAS - CASANARE
+// =====================================================
+
+// CAPA 1: BOSQUE
+const capaBosque = L.geoJSON(null, {
+    style: {
+        color: '#176B36',
+        weight: 1.5,
+        fillColor: '#32A852',
+        fillOpacity: 0.45
+    },
+    onEachFeature: function (feature, layer) {
+        const propiedades = feature.properties || {};
+
+        layer.bindPopup(
+            '<b>Bosque - Casanare</b><br>' +
+            Object.entries(propiedades)
+                .map(([clave, valor]) =>
+                    `<b>${clave}:</b> ${valor}`
+                )
+                .join('<br>')
+        );
+    }
+});
+
+// CAPA 2: DRENAJE SENCILLO
+const capaDrenaje = L.geoJSON(null, {
+    style: {
+        color: '#0877D1',
+        weight: 2.5,
+        opacity: 0.9
+    },
+    onEachFeature: function (feature, layer) {
+        const propiedades = feature.properties || {};
+
+        layer.bindPopup(
+            '<b>Drenaje sencillo - Casanare</b><br>' +
+            Object.entries(propiedades)
+                .map(([clave, valor]) =>
+                    `<b>${clave}:</b> ${valor}`
+                )
+                .join('<br>')
+        );
+    }
+});
+
+// CARGA DIFERIDA DE ARCHIVOS GEOJSON EXTERNOS
+// Los datos se descargan solamente cuando se activa cada capa.
+
+let bosqueCargado = false;
+let bosqueCargando = false;
+
+let drenajeCargado = false;
+let drenajeCargando = false;
+
+// CARGAR BOSQUE AL ACTIVAR LA CAPA
+capaBosque.on('add', function() {
+
+    if (bosqueCargado || bosqueCargando) {
+        return;
+    }
+
+    bosqueCargando = true;
+
+    fetch(GEOJSON_BOSQUE)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Error HTTP ' + response.status);
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (!data.features || !Array.isArray(data.features)) {
+                throw new Error('GeoJSON de Bosque no valido.');
+            }
+
+            capaBosque.addData(data);
+            bosqueCargado = true;
+
+            console.log(
+                'Bosque - Casanare:',
+                data.features.length,
+                'elementos cargados'
+            );
+        })
+        .catch(error => {
+            console.error('Error en Bosque:', error);
+        })
+        .finally(() => {
+            bosqueCargando = false;
+        });
+
+});
+
+// CARGAR DRENAJE AL ACTIVAR LA CAPA
+capaDrenaje.on('add', function() {
+
+    if (drenajeCargado || drenajeCargando) {
+        return;
+    }
+
+    drenajeCargando = true;
+
+    fetch(GEOJSON_DRENAJE)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Error HTTP ' + response.status);
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (!data.features || !Array.isArray(data.features)) {
+                throw new Error('GeoJSON de Drenaje no valido.');
+            }
+
+            capaDrenaje.addData(data);
+            drenajeCargado = true;
+
+            console.log(
+                'Drenaje sencillo - Casanare:',
+                data.features.length,
+                'elementos cargados'
+            );
+        })
+        .catch(error => {
+            console.error('Error en Drenaje:', error);
+        })
+        .finally(() => {
+            drenajeCargando = false;
+        });
+
+});
 
 // =====================================================
 // 3. CAPAS BASE
+// =====================================================
+
 // =====================================================
 
 const baseLayers = {
@@ -87,44 +207,15 @@ const baseLayers = {
 baseLayers['Mapa base (OSM)'].addTo(map);
 
 // =====================================================
-// 4. CAPAS WMS - GEOSERVER
 // =====================================================
-
-const departamentosWMS = L.tileLayer.wms(GEOSERVER_WMS, {
-    layers: 'taller_gis:departamentos_mgn2025',
-    format: 'image/png',
-    transparent: true,
-    version: '1.1.1',
-    styles: 'polygon',
-    opacity: 0.90,
-    tiled: true,
-    zIndex: 400,
-    attribution: 'DANE - MGN 2025'
-});
-
-const municipiosWMS = L.tileLayer.wms(GEOSERVER_WMS, {
-    layers: 'taller_gis:municipios_mgn2025',
-    format: 'image/png',
-    transparent: true,
-    version: '1.1.1',
-    styles: 'polygon',
-    opacity: 0.75,
-    tiled: true,
-    zIndex: 450,
-    attribution: 'DANE - MGN 2025'
-});
-
-departamentosWMS.addTo(map);
-
-// =====================================================
-// 5. CONTROL DE CAPAS
+// 4. CONTROL DE CAPAS - GEOJSON ESTATICO
 // =====================================================
 
 const overlayLayers = {
 
-    'Departamentos de Colombia (WMS)': departamentosWMS,
+    'Bosque - Casanare': capaBosque,
 
-    'Municipios de Colombia (WMS)': municipiosWMS
+    'Drenaje sencillo - Casanare': capaDrenaje
 
 };
 
@@ -138,77 +229,43 @@ const layerControl = L.control.layers(
 ).addTo(map);
 
 // =====================================================
-// 6. MUNICIPIOS VECTOR TILES - PG_TILESERV
+// 5. MUNICIPIOS DE COLOMBIA - GEOJSON LOCAL
 // =====================================================
 
-let municipiosVectorTiles = null;
+let municipiosCargados = false;
+let municipiosCargando = false;
 
-function configurarMunicipiosVectorTiles() {
+const municipiosGeoJSON = L.geoJSON(null, {
 
-    if (typeof L.vectorGrid === 'undefined') {
+    style: function() {
+        return {
+            color: '#34495e',
+            weight: 1,
+            opacity: 0.9,
+            fillColor: '#3498db',
+            fillOpacity: 0.20
+        };
+    },
 
-        console.error(
-            'Leaflet.VectorGrid no está disponible. ' +
-            'Revisa la biblioteca incluida en index.html.'
-        );
+    onEachFeature: function(feature, layer) {
 
-        return;
-
-    }
-
-    municipiosVectorTiles = L.vectorGrid.protobuf(
-        MUNICIPIOS_VECTOR_URL,
-        {
-
-            rendererFactory: L.canvas.tile,
-
-            vectorTileLayerStyles: {
-
-                municipios_mgn2025: {
-                    weight: 1,
-                    color: '#34495e',
-                    opacity: 0.9,
-                    fill: true,
-                    fillColor: '#3498db',
-                    fillOpacity: 0.20
-                }
-
-            },
-
-            interactive: true,
-
-            minZoom: 3,
-
-            maxNativeZoom: 14,
-
-            maxZoom: 19,
-
-            zIndex: 460,
-
-            getFeatureId: function(feature) {
-                return feature.properties.objectid;
-            }
-
-        }
-    );
-
-    municipiosVectorTiles.on('click', function(event) {
-
-        const propiedades = event.layer.properties || {};
+        const props = feature.properties || {};
 
         const nombre = escapeHTML(
-            propiedades.mpio_cnmbr || 'Sin nombre'
+            props.mpio_cnmbr || 'Sin nombre'
         );
 
         const departamento = escapeHTML(
-            propiedades.dpto_cnmbr || 'No disponible'
+            props.dpto_cnmbr || 'No disponible'
         );
 
         const codigo = escapeHTML(
-            propiedades.mpio_ccdgo || 'No disponible'
+            props.mpio_ccdgo ||
+            props.mpio_cdpmp ||
+            'No disponible'
         );
 
-        const area = Number(propiedades.mpio_narea);
+        const area = Number(props.mpio_narea);
 
         const areaTexto = Number.isFinite(area)
             ? area.toLocaleString('es-CO')
@@ -226,71 +283,340 @@ function configurarMunicipiosVectorTiles() {
             departamento +
             '</p>' +
 
-            '<p><strong>Código municipal:</strong> ' +
+            '<p><strong>Codigo municipal:</strong> ' +
             codigo +
             '</p>' +
 
-            '<p><strong>Área reportada:</strong> ' +
+            '<p><strong>Area reportada:</strong> ' +
             areaTexto +
             '</p>' +
 
             '<p><strong>Fuente:</strong> DANE - MGN 2025</p>' +
 
-            '<p><strong>Servicio:</strong> pg_tileserv - Vector Tiles</p>';
+            '<p><strong>Formato:</strong> GeoJSON local</p>';
 
-        L.popup()
-            .setLatLng(event.latlng)
-            .setContent(contenido)
-            .openOn(map);
+        layer.bindPopup(contenido);
 
-        actualizarPanel(
+        layer.on('click', function() {
 
-            '<p><strong>Municipio seleccionado</strong></p>' +
+            actualizarPanel(
 
-            '<p class="highlight">' +
-            nombre +
-            '</p>' +
+                '<p><strong>Municipio seleccionado</strong></p>' +
 
-            '<p><strong>Departamento:</strong> ' +
-            departamento +
-            '</p>' +
+                '<p class="highlight">' +
+                nombre +
+                '</p>' +
 
-            '<p><strong>Código:</strong> ' +
-            codigo +
-            '</p>' +
+                '<p><strong>Departamento:</strong> ' +
+                departamento +
+                '</p>' +
 
-            '<p><strong>Área reportada:</strong> ' +
-            areaTexto +
-            '</p>' +
+                '<p><strong>Codigo:</strong> ' +
+                codigo +
+                '</p>' +
 
-            '<p><strong>Fuente:</strong> DANE - MGN 2025</p>'
+                '<p><strong>Area reportada:</strong> ' +
+                areaTexto +
+                '</p>' +
 
-        );
+                '<p><strong>Fuente:</strong> DANE - MGN 2025</p>'
 
+            );
+
+        });
+
+    }
+
+});
+
+// Carga diferida: solo descarga los municipios cuando
+// el usuario activa la capa desde el control de Leaflet.
+municipiosGeoJSON.on('add', function() {
+
+    if (municipiosCargados || municipiosCargando) {
+        return;
+    }
+
+    municipiosCargando = true;
+
+    fetch('datos/colombia/municipios.geojson')
+
+        .then(function(response) {
+
+            if (!response.ok) {
+                throw new Error('HTTP ' + response.status);
+            }
+
+            return response.json();
+
+        })
+
+        .then(function(data) {
+
+            if (!data.features || data.features.length === 0) {
+                throw new Error('El GeoJSON no contiene municipios.');
+            }
+
+            municipiosGeoJSON.addData(data);
+
+            municipiosCargados = true;
+            municipiosCargando = false;
+
+            console.log(
+                'Municipios GeoJSON locales cargados:',
+                data.features.length
+            );
+
+        })
+
+        .catch(function(error) {
+
+            municipiosCargando = false;
+
+            console.error(
+                'Error al cargar municipios locales:',
+                error
+            );
+
+            actualizarPanel(
+                '<p><strong>Error al cargar municipios.</strong></p>' +
+                '<p>Verifica el archivo datos/colombia/municipios.geojson.</p>'
+            );
+
+        });
+
+});
+
+layerControl.addOverlay(
+    municipiosGeoJSON,
+    'Municipios de Colombia (GeoJSON local)'
+);
+
+
+// INICIO CAPAS BOYACA - CARGA DIFERIDA
+// Los GeoJSON se descargan al activar cada capa.
+
+function crearCapaBoyaca(config) {
+
+    let cargada = false;
+    let cargando = false;
+
+    const capa = L.geoJSON(null, {
+
+        style: config.style,
+
+        pointToLayer: config.pointToLayer,
+
+        onEachFeature: function(feature, layer) {
+
+            const props = feature.properties || {};
+
+            const titulo =
+                props[config.campoTitulo] ||
+                config.nombre;
+
+            const filas = Object.entries(props)
+                .filter(([clave, valor]) =>
+                    valor !== null &&
+                    valor !== undefined &&
+                    String(valor).trim() !== ''
+                )
+                .slice(0, 10)
+                .map(([clave, valor]) => {
+
+                    const texto = typeof valor === 'object'
+                        ? JSON.stringify(valor)
+                        : String(valor);
+
+                    return '<p><strong>' +
+                        escapeHTML(clave) +
+                        ':</strong> ' +
+                        escapeHTML(texto) +
+                        '</p>';
+                })
+                .join('');
+
+            layer.bindPopup(
+                '<div class="popup-title">' +
+                escapeHTML(titulo) +
+                '</div>' +
+                '<div class="popup-divider"></div>' +
+                filas +
+                '<p><strong>Fuente:</strong> GeoJSON local de Boyaca</p>'
+            );
+        }
     });
 
-    municipiosVectorTiles.on('tileerror', function(error) {
+    capa.on('add', function() {
 
-        console.error(
-            'Error al cargar una tesela de municipios:',
-            error
-        );
+        if (cargada || cargando) {
+            return;
+        }
+
+        cargando = true;
+
+        fetch(config.url)
+
+            .then(function(response) {
+
+                if (!response.ok) {
+                    throw new Error('HTTP ' + response.status);
+                }
+
+                return response.json();
+
+            })
+
+            .then(function(data) {
+
+                if (!data || !Array.isArray(data.features)) {
+                    throw new Error('El archivo no contiene un GeoJSON valido.');
+                }
+
+                capa.addData(data);
+
+                cargada = true;
+
+                console.log(
+                    config.nombre + ':',
+                    data.features.length,
+                    'elementos cargados correctamente.'
+                );
+
+            })
+
+            .catch(function(error) {
+
+                console.error(
+                    'Error al cargar ' + config.nombre + ':',
+                    error
+                );
+
+                actualizarPanel(
+                    '<p><strong>Error al cargar ' +
+                    escapeHTML(config.nombre) +
+                    '.</strong></p>' +
+                    '<p>Verifica el archivo GeoJSON correspondiente.</p>'
+                );
+
+            })
+
+            .finally(function() {
+                cargando = false;
+            });
 
     });
 
     layerControl.addOverlay(
-        municipiosVectorTiles,
-        'Municipios de Colombia (Vector Tiles - PBF)'
+        capa,
+        config.nombre
     );
 
-    console.log(
-        'Municipios Vector Tiles configurados:',
-        MUNICIPIOS_VECTOR_URL
-    );
-
+    return capa;
 }
 
-// =====================================================
+// 1. HOSPITALES DE BOYACA
+const capaHospitalesBoyaca = crearCapaBoyaca({
+
+    nombre: 'Hospitales de Boyaca',
+
+    url: 'datos/boyaca/hospitales_boyaca.geojson',
+
+    campoTitulo: 'Nombre',
+
+    pointToLayer: function(feature, latlng) {
+
+        return L.circleMarker(latlng, {
+            radius: 6,
+            color: '#7B1FA2',
+            weight: 2,
+            fillColor: '#CE93D8',
+            fillOpacity: 0.9
+        });
+    }
+
+});
+
+// 2. MUNICIPIOS DE BOYACA
+const capaMunicipiosBoyaca = crearCapaBoyaca({
+
+    nombre: 'Municipios de Boyaca',
+
+    url: 'datos/boyaca/municipios_boyaca.geojson',
+
+    campoTitulo: 'mpio_cnmbr',
+
+    style: {
+        color: '#145A8D',
+        weight: 1.2,
+        opacity: 0.9,
+        fillColor: '#5DADE2',
+        fillOpacity: 0.18
+    }
+
+});
+
+// 3. PROVINCIAS DE BOYACA
+const capaProvinciasBoyaca = crearCapaBoyaca({
+
+    nombre: 'Provincias de Boyaca',
+
+    url: 'datos/boyaca/provincias_boyaca.geojson',
+
+    campoTitulo: 'provincia',
+
+    style: {
+        color: '#B9770E',
+        weight: 1.5,
+        opacity: 0.95,
+        fillColor: '#F5B041',
+        fillOpacity: 0.22
+    }
+
+});
+
+// 4. RED VIAL DEPARTAMENTAL
+const capaRedVialBoyaca = crearCapaBoyaca({
+
+    nombre: 'Red vial departamental - Boyaca',
+
+    url: 'datos/boyaca/red_vial_departamental.geojson',
+
+    campoTitulo: 'NOMBREVIA',
+
+    style: {
+        color: '#D35400',
+        weight: 2,
+        opacity: 0.85
+    }
+
+});
+
+// 5. VEREDAS DE BOYACA
+const capaVeredasBoyaca = crearCapaBoyaca({
+
+    nombre: 'Veredas de Boyaca',
+
+    url: 'datos/boyaca/veredas_boyaca.geojson',
+
+    campoTitulo: 'NOMBRE_VER',
+
+    style: {
+        color: '#287A45',
+        weight: 0.8,
+        opacity: 0.85,
+        fillColor: '#82C785',
+        fillOpacity: 0.16
+    }
+
+});
+
+// FIN CAPAS BOYACA - CARGA DIFERIDA
+
+
+
+
+
 // 7. ESCALA
 // =====================================================
 
@@ -327,17 +653,27 @@ legend.onAdd = function() {
 
         '<div class="legend-item">' +
         '<i style="background:#3498db; opacity:0.6;"></i>' +
-        '<span>Municipios Vector Tiles</span>' +
+        '<span>Municipios GeoJSON</span>' +
         '</div>' +
 
         '<div class="legend-item">' +
         '<i style="background:#e74c3c; opacity:0.9;"></i>' +
-        '<span>Ciudades WFS</span>' +
+        '<span>Ciudades GeoJSON</span>' +
         '</div>' +
 
         '<div class="legend-item">' +
         '<i style="background:#ffffff;"></i>' +
-        '<span>Límites administrativos WMS</span>' +
+        '<span>Limites administrativos GeoJSON</span>' +
+        '</div>' +
+
+        '<div class="legend-item">' +
+        '<i style="background:#32A852; opacity:0.7;"></i>' +
+        '<span>Bosque - Casanare</span>' +
+        '</div>' +
+
+        '<div class="legend-item">' +
+        '<i style="background:#0877D1;"></i>' +
+        '<span>Drenaje sencillo - Casanare</span>' +
         '</div>';
 
     return div;
@@ -385,7 +721,7 @@ function normalizarTexto(texto) {
 }
 
 // =====================================================
-// 10. CIUDADES WFS
+// 10. CIUDADES GEOJSON
 // =====================================================
 
 let ciudadesGeoJSON = null;
@@ -448,9 +784,9 @@ function obtenerNombreCiudad(feature) {
 
 }
 
-function cargarCiudadesWFS() {
+function cargarCiudadesGeoJSON() {
 
-    fetch(WFS_URL)
+    fetch('datos/colombia/ciudades.geojson')
 
         .then(response => {
 
@@ -509,7 +845,7 @@ function cargarCiudadesWFS() {
                         poblacion.toLocaleString('es-CO') +
                         '</p>' +
 
-                        '<p><strong>Fuente:</strong> GeoServer WFS</p>';
+                        '<p><strong>Fuente:</strong> GeoJSON local</p>';
 
                     layer.bindPopup(contenido);
 
@@ -545,23 +881,23 @@ function cargarCiudadesWFS() {
 
             layerControl.addOverlay(
                 ciudadesGeoJSON,
-                'Ciudades (WFS - GeoJSON)'
+                'Ciudades (GeoJSON local)'
             );
 
             console.log(
-                'Ciudades WFS cargadas:',
+                'Ciudades GeoJSON locales cargadas:',
                 data.features.length
             );
 
             actualizarPanel(
 
-                '<p><strong>Conexión exitosa con GeoServer</strong></p>' +
+                '<p><strong>Datos geograficos locales cargados</strong></p>' +
 
                 '<p>Ciudades cargadas: ' +
                 data.features.length +
                 '</p>' +
 
-                '<p>Departamentos y municipios disponibles mediante WMS y Vector Tiles.</p>' +
+                '<p>Departamentos y municipios disponibles mediante GeoJSON.</p>' +
 
                 '<p class="info-text">Utiliza el buscador para localizar ciudades.</p>'
 
@@ -572,7 +908,7 @@ function cargarCiudadesWFS() {
         .catch(error => {
 
             console.error(
-                'Error al cargar ciudades WFS:',
+                'Error al cargar ciudades GeoJSON:',
                 error
             );
 
@@ -597,7 +933,7 @@ function cargarCiudadesWFS() {
 }
 
 // =====================================================
-// 11. DEPARTAMENTOS WFS
+// 11. DEPARTAMENTOS GEOJSON
 // =====================================================
 
 let departamentosGeoJSON = null;
@@ -660,9 +996,9 @@ function restaurarDepartamento(e) {
 
 }
 
-function cargarDepartamentosWFS() {
+function cargarDepartamentosGeoJSON() {
 
-    fetch(WFS_DEPARTAMENTOS_URL)
+    fetch('datos/colombia/departamentos.geojson')
 
         .then(response => {
 
@@ -804,11 +1140,11 @@ function cargarDepartamentosWFS() {
 
             layerControl.addOverlay(
                 departamentosGeoJSON,
-                'Departamentos interactivos (WFS - GeoJSON)'
+                'Departamentos de Colombia (GeoJSON local)'
             );
 
             console.log(
-                'Departamentos WFS cargados:',
+                'Departamentos GeoJSON locales cargados:',
                 data.features.length
             );
 
@@ -817,13 +1153,13 @@ function cargarDepartamentosWFS() {
         .catch(error => {
 
             console.error(
-                'Error al cargar departamentos WFS:',
+                'Error al cargar departamentos GeoJSON:',
                 error
             );
 
             actualizarPanel(
 
-                '<p><strong>Error al cargar departamentos WFS.</strong></p>' +
+                '<p><strong>Error al cargar departamentos GeoJSON.</strong></p>' +
 
                 '<p>' +
                 escapeHTML(error.message) +
@@ -834,7 +1170,6 @@ function cargarDepartamentosWFS() {
         });
 
 }
-
 // =====================================================
 // 12. BUSCADOR DE CIUDADES
 // =====================================================
@@ -969,7 +1304,7 @@ function configurarBuscador() {
                     escapeHTML(nombre) +
                     '</p>' +
 
-                    '<p>La ubicación fue encontrada mediante el servicio WFS.</p>'
+                    '<p>La ubicación fue encontrada en los datos GeoJSON locales.</p>'
 
                 );
 
@@ -1011,37 +1346,13 @@ document.addEventListener(
     'DOMContentLoaded',
     function() {
 
-        console.log(
-            'Iniciando aplicación Leaflet...'
-        );
-
-        console.log(
-            'GeoServer WFS ciudades:',
-            WFS_URL
-        );
-
-        console.log(
-            'GeoServer WFS departamentos:',
-            WFS_DEPARTAMENTOS_URL
-        );
-
-        console.log(
-            'GeoServer WMS:',
-            GEOSERVER_WMS
-        );
-
-        console.log(
-            'pg_tileserv:',
-            MUNICIPIOS_VECTOR_URL
-        );
-
         configurarBuscador();
 
-        configurarMunicipiosVectorTiles();
 
-        cargarCiudadesWFS();
 
-        cargarDepartamentosWFS();
+        cargarCiudadesGeoJSON();
+
+        cargarDepartamentosGeoJSON();
 
     }
 );

@@ -1,10 +1,10 @@
-﻿
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Visualización interactiva de departamentos, municipios y ciudades de Colombia mediante servicios geográficos.">
+    <meta name="description" content="Visualización interactiva de departamentos, municipios y ciudades de Colombia mediante archivos GeoJSON estáticos.">
     <meta name="author" content="Luis Fernando Acevedo Suarez">
     <title>Visor Geográfico de Colombia | Luis Fernando Acevedo Suarez</title>
 
@@ -37,7 +37,7 @@
                     <ul>
                         <li>Departamentos (33)</li>
                         <li>Municipios (1.122)</li>
-                        <li>Ciudades (WFS)</li>
+                        <li>Ciudades (GeoJSON)</li>
                     </ul>
 
                     <p class="info-text">
@@ -79,9 +79,9 @@
 
                 <p class="small-text">
                     <strong>Fuente administrativa:</strong> DANE - MGN 2025<br>
-                    <strong>Servidor:</strong> GeoServer<br>
-                    <strong>Base de datos:</strong> PostGIS<br>
-                    <strong>Estándares:</strong> OGC WMS y WFS<br>
+                    <strong>Distribucion:</strong> GitHub Pages<br>
+                    <strong>Datos:</strong> Archivos GeoJSON estaticos<br>
+                    <strong>Formato:</strong> GeoJSON<br>
                     <strong>Biblioteca:</strong> Leaflet.js
                 </p>
             </section>
@@ -96,7 +96,7 @@
 
     <footer class="footer">
         <p>
-            Aplicación desarrollada por Luis Fernando Acevedo Suarez | Leaflet.js, GeoServer y PostGIS
+            Aplicación desarrollada por Luis Fernando Acevedo Suarez | Leaflet.js, GeoJSON y GitHub Pages
         </p>
     </footer>
 
@@ -106,8 +106,6 @@
     crossorigin="">
 </script>
 
-<!-- Complemento para visualizar Vector Tiles MVT/PBF -->
-<script src="https://unpkg.com/leaflet.vectorgrid@1.3.0/dist/Leaflet.VectorGrid.bundled.js"></script>
 
 <script src="js/app.js"></script>
 
